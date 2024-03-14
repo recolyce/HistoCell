@@ -1,8 +1,4 @@
-<style> h2 { border-bottom: none } </style>
-
-# HistoCell<img src="image/README/logo.png" width = 150 align = right>
-
-## Outline
+# HistoCell<img src="image/README/logo.png" width = 250 align = right>
 
 **HistoCell** is a **weakly-supervised deep learning framework** to elucidate the **hierarchical spatial cellular information** including **tissue compartments, single cell types and cell states** with **histopathology images only**. This tutorial implements HistoCell to predict super-resolution spatial cellular information and illustrates the representative applications. The link to the HistoCell method will be presented soon.
 
