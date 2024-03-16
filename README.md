@@ -36,9 +36,9 @@ The pretrained model and inference code will be released soon. Here we only illu
   <img src="image/README/tissue_compartment.jpg" alt="Image" width="400" style="display: block; margin: 0 auto;">
 
 * **Single-cell Type**
-
-  <img src="image/README/cell_type1.jpg" alt="Image" width="500" style="display: block; margin: 0 auto;">
   <img src="image/README/cell_type2.jpg" alt="Image" width="500" style="display: block; margin: 0 auto;">
+  <img src="image/README/cell_type1.jpg" alt="Image" width="500" style="display: block; margin: 0 auto;">
+
 
   Red, blue and green scatters represent cancer epithelial cells, stromal cells and macrophage cells.
 * **Cell States**
