@@ -32,12 +32,13 @@ With cell segmentation by HoVerNet, you will get json file as the segmentation r
 The pretrained model and inference code will be released soon. Here we only illustrate the demo and representative results corrsponding to the paper in the Tutorial.ipynb. The predicted hierarchical spatial cellular information is storaged as a dict in a pickle file for each slide.
 
 * **Tissue Compartment**
-
+  <div align = center>
   <img src="image/README/tissue_compartment.jpg" alt="Image" width="400" align="center">
-
+  </div>
 * **Single-cell Type**
 
   <img src="image/README/cell_type2.jpg" alt="Image" width="500" style="display: block; margin: auto auto;">
+  
   <img src="image/README/cell_type1.jpg" alt="Image" width="500" style="display: block; margin: auto auto;">
 
 
