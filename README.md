@@ -33,7 +33,7 @@ The pretrained model and inference code will be released soon. Here we only illu
 
 * **Tissue Compartment**
 
-  <img src="image/README/tissue_compartment.jpg" alt="Image" width="400" style="display: block; margin: auto auto;">
+  <img src="image/README/tissue_compartment.jpg" alt="Image" width="400" align="center" style="display: block;">
 
 * **Single-cell Type**
 
