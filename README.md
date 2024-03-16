@@ -36,39 +36,41 @@ The pretrained model and inference code will be released soon. Here we only illu
   <img src="image/README/tissue_compartment.jpg" alt="Image" width="400" align="center">
   </div>
 * **Single-cell Type**
-
+<div align = center>
   <img src="image/README/cell_type2.jpg" alt="Image" width="500" style="display: block; margin: auto auto;">
-  
+</div>
+<div align = center>
   <img src="image/README/cell_type1.jpg" alt="Image" width="500" style="display: block; margin: auto auto;">
-
+</div>
 
   Red, blue and green scatters represent cancer epithelial cells, stromal cells and macrophage cells.
 * **Cell States**
-
+<div align = center>
   <img src="image/README/cell_state.jpg" alt="Image" width="800" style="display: block; margin: auto auto;">
-
+</div>
 ## Representative Application: Tissue Segmentation
 
 With a histopathology image, HistoCell could first infer pixel-level cell types and then cluster cells as tissue regions, which exhibit high accuracy and allow users to further identify the small foci within tissue regions at pixel-level resolution. 
-
+<div align = center>
 <img src="image/README/segmentation.jpg" alt="Image" width="500"  style="display: block; margin: auto auto;">
-
+</div>
 ## Representative Application: Cell Type Deconvolution
 
 Since HistoCell Integrates spot-level cellular compositions deconvoluted from expression data and those based on histologic morphologic features, it could produce a more precise and robust deconvolution result. 
-
+<div align = center>
 <img src="image/README/deconvolution1.jpg" alt="Image" width="500" style="display: block; margin: auto auto;">
-
+</div>
+<div align = center>
 <img src="image/README/deconvolution2.jpg" alt="Image" width="500" style="display: block; margin: auto auto;">
-
+</div>
 ## Representative Application: Spatial Biomarker Identification
-
+<div align = center>
 <img src="image/README/SOI.jpg" alt="Image" width="400" style="display: block; margin: auto auto;">
-
+</div>
 The histopathology image is coverted to **spatial cellular map** with HistoCell and the cells are accumulated as clusters. Through the correlation analysis between clinical outcomes and cellular spatial clustering features, we identify spatial biomarkers for prognosis. Demo results can be found in Tutorial.ipynb. The representative spatial features for prognosis stratification is visualized as below.
-
+<div align = center>
 <img src="image/README/biomarker.jpg" alt="Image" width="1000" style="display: block; margin: auto auto;">
-
+</div>
 
 
 
