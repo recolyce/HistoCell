@@ -2,7 +2,7 @@
 
 **HistoCell** is a **weakly-supervised deep learning framework** to elucidate the **hierarchical spatial cellular information** including **tissue compartments, single cell types and cell states** with **histopathology images only**. This tutorial implements HistoCell to predict super-resolution spatial cellular information and illustrates the representative applications. The link to the HistoCell method will be presented soon.
 
-<img src="image/README/Intro.jpg" alt="Image" width="800" class="center" style="display: block; margin: 0 auto;">
+<img src="image/README/Intro.jpg" alt="Image" width="800" align="middle" style="display: block; margin: 0 auto;">
 
 ## Data Format and Preprocessing
 
@@ -33,40 +33,40 @@ The pretrained model and inference code will be released soon. Here we only illu
 
 * **Tissue Compartment**
 
-  <img src="image/README/tissue_compartment.jpg" alt="Image" width="400" class="center" style="display: block; margin: 0 auto;">
+  <img src="image/README/tissue_compartment.jpg" alt="Image" width="400" align="middle" style="display: block; margin: 0 auto;">
 
 * **Single-cell Type**
 
-  <img src="image/README/cell_type2.jpg" alt="Image" width="500" class="center" style="display: block; margin: 0 auto;">
-  <img src="image/README/cell_type1.jpg" alt="Image" width="500" class="center" style="display: block; margin: 0 auto;">
+  <img src="image/README/cell_type2.jpg" alt="Image" width="500" align="middle" style="display: block; margin: 0 auto;">
+  <img src="image/README/cell_type1.jpg" alt="Image" width="500" align="middle" style="display: block; margin: 0 auto;">
 
 
   Red, blue and green scatters represent cancer epithelial cells, stromal cells and macrophage cells.
 * **Cell States**
 
-  <img src="image/README/cell_state.jpg" alt="Image" width="800" class="center" style="display: block; margin: 0 auto;">
+  <img src="image/README/cell_state.jpg" alt="Image" width="800" align="middle" style="display: block; margin: 0 auto;">
 
 ## Representative Application: Tissue Segmentation
 
 With a histopathology image, HistoCell could first infer pixel-level cell types and then cluster cells as tissue regions, which exhibit high accuracy and allow users to further identify the small foci within tissue regions at pixel-level resolution. 
 
-<img src="image/README/segmentation.jpg" alt="Image" width="500" class="center" style="display: block; margin: 0 auto;">
+<img src="image/README/segmentation.jpg" alt="Image" width="500" align="middle" style="display: block; margin: 0 auto;">
 
 ## Representative Application: Cell Type Deconvolution
 
 Since HistoCell Integrates spot-level cellular compositions deconvoluted from expression data and those based on histologic morphologic features, it could produce a more precise and robust deconvolution result. 
 
-<img src="image/README/deconvolution1.jpg" alt="Image" width="500" class="center" style="display: block; margin: 0 auto;">
+<img src="image/README/deconvolution1.jpg" alt="Image" width="500" align="middle" style="display: block; margin: 0 auto;">
 
-<img src="image/README/deconvolution2.jpg" alt="Image" width="500" class="center" style="display: block; margin: 0 auto;">
+<img src="image/README/deconvolution2.jpg" alt="Image" width="500" align="middle" style="display: block; margin: 0 auto;">
 
 ## Representative Application: Spatial Biomarker Identification
 
-<img src="image/README/SOI.jpg" alt="Image" width="400" class="center" style="display: block; margin: 0 auto;">
+<img src="image/README/SOI.jpg" alt="Image" width="400" align="middle" style="display: block; margin: 0 auto;">
 
 The histopathology image is coverted to **spatial cellular map** with HistoCell and the cells are accumulated as clusters. Through the correlation analysis between clinical outcomes and cellular spatial clustering features, we identify spatial biomarkers for prognosis. Demo results can be found in Tutorial.ipynb. The representative spatial features for prognosis stratification is visualized as below.
 
-<img src="image/README/biomarker.jpg" alt="Image" width="1000" class="center" style="display: block; margin: 0 auto;">
+<img src="image/README/biomarker.jpg" alt="Image" width="1000" align="middle" style="display: block; margin: 0 auto;">
 
 
 
