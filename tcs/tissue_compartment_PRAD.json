@@ -1,0 +1,8 @@
+{
+    "dict": 
+    {"0": "TME", "1": "Epi", "2": "Stromal", "3": "Stromal", "4": "TME", "5": "TME", "6": "TME"},
+    "list":
+    ["Epi", "TME", "Stromal"],
+    "HoVerNet":
+    [2, 0, 1, 2, 2, 0]
+}

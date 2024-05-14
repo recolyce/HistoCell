@@ -1,15 +1,21 @@
 # HistoCell<img src="image/README/logo.png" width = 150 align = right>
 
-**HistoCell** is a **weakly-supervised deep learning framework** to elucidate the **hierarchical spatial cellular information** including **tissue compartments, single cell types and cell states** with **histopathology images only**. This tutorial implements HistoCell to predict super-resolution spatial cellular information and illustrates the representative applications. The link to the HistoCell method will be presented soon.
+**HistoCell** is a **weakly-supervised deep learning framework** to elucidate the **hierarchical spatial cellular information** including **tissue compartments, single cell types and cell states** with **histopathology images only**. This tutorial implements HistoCell to predict super-resolution spatial cellular information and illustrates the representative applications. The link to the HistoCell method will be presented soon. \
+Our website: http://histocell.qhdyr.net/index/index/index.html
 
 <img src="image/README/Intro.jpg" alt="Image" width="800" style="display: block; margin: 0 auto;">
+
+## Environments
+```sh
+pip install -r requirements.txt
+```
 
 ## Data Format and Preprocessing
 
 ### Data Preparation
 
 * For model pre-train, HistoCell takes the **scRNA-seq** and **spatial transcriptomics** data with paired **high-resolution histopathology images** as input.
-  * For histopathology images, we cut the paired images according to the pixel coordinates from ST data.
+  * For histopathology images, we cut the paired images according to the pixel coordinates from ST data. The preprocessing code can be found in **./tutorial/tutorial.ipynb**
   * For transcriptomics data, we apply deconvolution methods to get the cell composition as the supervision. Applicable methods are listed as [CARD](https://www.nature.com/articles/s41587-022-01273-7), [RCTD](https://www.nature.com/articles/s41587-021-00830-w), [Tangram](https://www.nature.com/articles/s41592-021-01264-7), [Cell2location](https://www.nature.com/articles/s41587-021-01139-4) etc.
 * For model inference, HistoCell only requires the histopathology images including tiles and WSIs.
   * WSIs should be formatted as .svs or .tif. In order to convert the WSIs into the tiles can be processed in a high-throughput manner, we apply the toolbox from [CLAM](https://github.com/mahmoodlab/CLAM) for image segmentation, stitching and patching. As for TCGA diagnostic images, patch of 256x256 pixels is recommended.
@@ -27,9 +33,68 @@ With cell segmentation by HoVerNet, you will get json file as the segmentation r
 {"mag": null, "nuc": {"YOUR_CELL_ID": {"bbox": [[1, 2], [3, 4]], "centroid": [2, 3], "contour": [[0, 1]], "type_prob": 0.9, "type": 0}}}
 ```
 
-## Inference with histopathology images only
+### Input data format
+The tiled images, segmentation results(json file) and cell type/state proportion given by deconvolution are required during training process.
 
-The pretrained model and inference code will be released soon. Here we only illustrate the demo and representative results corrsponding to the paper in the Tutorial.ipynb. The predicted hierarchical spatial cellular information is storaged as a dict in a pickle file for each slide.
+## Model pre-training with ST data
+Run **train.py** for model pre-training. You need to change the parameters in **configs.py** including the model information, dataset directory and training details. Besides, choose the proper tissue compartment file in **./tcs**. To develop your own model, run the command below.
+```python
+python train.py \
+--model YOUR_MODEL_DESC \
+--tissue TISSUE_TYPE \
+--deconv DECONVOLUTION_METHOD \
+--prefix SAMPLE_PREFIX \
+--k_class NUM_OF_CLASS \
+--tissue_compartment PATH_TO_TCS_FILE
+```
+A simple demo:
+```python
+python train.py \
+--model Breast_Benchmark_H1 \
+--tissue BRCA \
+--deconv RCTD \
+--prefix H1 \
+--k_class 6 \
+--tissue_compartment ./tcs/tissue_compartment_addtype.json
+```
+
+As for cross validation, you can easily run a demo based on **train_cv.py**.
+```python
+python train_cv.py \
+--model Breast_Benchmark_10x \
+--tissue BRCA \
+--deconv RCTD \
+--prefix 10x_BRCA \
+--k_class 6 \
+--tissue_compartment ./tcs/tissue_compartment_addtype.json \
+--folder 10
+```
+
+As for cell state, you can run **train_state.py** and **train_state_cv.py** to develop the cell state prediction model. The command is similar to the cell type ones.
+
+The training code will be realeased after publication.
+
+## Inference with histopathology images only
+Download the demo data and pre-trained model: https://drive.google.com/file/d/1XpNQBmEJdKAKP-3xEiTI3SHS_lgo9Jqq/view?usp=sharing \
+Download it and put it under the ./demo directory.
+
+With the pretrained model, you can infer the cellular spatial profile with **infer.py**.
+```python
+python infer.py \
+--model Breast_Benchmark_H1 \
+--epoch 30 \
+--tissue BRCA \
+--deconv RCTD \
+--prefix H1_hires \
+--k_class 6 \
+--tissue_compartment ./tcs/tissue_compartment_addtype.json \
+--omit_gt
+```
+
+## Representative Results
+Here we only illustrate the demo and representative results corrsponding to the paper in the tutorial.ipynb. The predicted hierarchical spatial cellular information is storaged as a dict in a pickle file for each slide. For more results, you can directly jump to our [HistoCell website](http://histocell.qhdyr.net/index/index/index.html).
+
+### Benchmark results
 
 * **Tissue Compartment**
   <div align = center>
@@ -48,13 +113,15 @@ The pretrained model and inference code will be released soon. Here we only illu
 <div align = center>
   <img src="image/README/cell_state.jpg" alt="Image" width="800" style="display: block; margin: auto auto;">
 </div>
-## Representative Application: Tissue Segmentation
+
+### Representative Application: Tissue Segmentation
 
 With a histopathology image, HistoCell could first infer pixel-level cell types and then cluster cells as tissue regions, which exhibit high accuracy and allow users to further identify the small foci within tissue regions at pixel-level resolution. 
 <div align = center>
 <img src="image/README/segmentation.jpg" alt="Image" width="500"  style="display: block; margin: auto auto;">
 </div>
-## Representative Application: Cell Type Deconvolution
+
+### Representative Application: Cell Type Deconvolution
 
 Since HistoCell Integrates spot-level cellular compositions deconvoluted from expression data and those based on histologic morphologic features, it could produce a more precise and robust deconvolution result. 
 <div align = center>
@@ -63,7 +130,8 @@ Since HistoCell Integrates spot-level cellular compositions deconvoluted from ex
 <div align = center>
 <img src="image/README/deconvolution2.jpg" alt="Image" width="500" style="display: block; margin: auto auto;">
 </div>
-## Representative Application: Spatial Biomarker Identification
+
+### Representative Application: Spatial Biomarker Identification
 <div align = center>
 <img src="image/README/SOI.jpg" alt="Image" width="400" style="display: block; margin: auto auto;">
 </div>
