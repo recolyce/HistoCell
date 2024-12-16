@@ -3,7 +3,7 @@
 **HistoCell** is a **weakly-supervised deep learning framework** to elucidate the **hierarchical spatial cellular information** including **tissue compartments, single cell types and cell states** with **histopathology images only**. This tutorial implements HistoCell to predict super-resolution spatial cellular information and illustrates the representative applications. The link to the HistoCell method will be presented soon. \
 Our website: http://histocell.qhdyr.net/index/index/index.html
 
-<img src="image/README/Intro.jpg" alt="Image" width="800" style="display: block; margin: 0 auto;">
+<img src="image/README/Intro.png" alt="Image" width="800" style="display: block; margin: 0 auto;">
 
 ## Environments
 ```sh
@@ -93,14 +93,15 @@ python infer.py \
 
 ## Representative Results
 Here we only illustrate the demo and representative results corrsponding to the paper in the tutorial.ipynb. The predicted hierarchical spatial cellular information is storaged as a dict in a pickle file for each slide. For more results, you can directly jump to our [HistoCell website](http://histocell.qhdyr.net/index/index/index.html).
+The demo results could be reproduced through tutorial/tutorial.ipynb
 
 ### Benchmark results
 
-* **Tissue Compartment**
+* **Tissue compartment**
   <div align = center>
   <img src="image/README/tissue_compartment.jpg" alt="Image" width="400" align="center">
   </div>
-* **Single-cell Type**
+* **Single-nucleus cell type**
 <div align = center>
   <img src="image/README/cell_type2.jpg" alt="Image" width="500" style="display: block; margin: auto auto;">
 </div>
@@ -109,19 +110,19 @@ Here we only illustrate the demo and representative results corrsponding to the 
 </div>
 
   Red, blue and green scatters represent cancer epithelial cells, stromal cells and macrophage cells.
-* **Cell States**
+* **Cell states**
 <div align = center>
   <img src="image/README/cell_state.jpg" alt="Image" width="800" style="display: block; margin: auto auto;">
 </div>
 
-### Representative Application: Tissue Segmentation
+### Representative application: subtle tissue annotation
 
 With a histopathology image, HistoCell could first infer pixel-level cell types and then cluster cells as tissue regions, which exhibit high accuracy and allow users to further identify the small foci within tissue regions at pixel-level resolution. 
 <div align = center>
 <img src="image/README/segmentation.jpg" alt="Image" width="500"  style="display: block; margin: auto auto;">
 </div>
 
-### Representative Application: Cell Type Deconvolution
+### Representative application: cell type deconvolution
 
 Since HistoCell Integrates spot-level cellular compositions deconvoluted from expression data and those based on histologic morphologic features, it could produce a more precise and robust deconvolution result. 
 <div align = center>
@@ -131,11 +132,11 @@ Since HistoCell Integrates spot-level cellular compositions deconvoluted from ex
 <img src="image/README/deconvolution2.jpg" alt="Image" width="500" style="display: block; margin: auto auto;">
 </div>
 
-### Representative Application: Spatial Biomarker Identification
+### Representative application: spatial biomarker identification
 <div align = center>
 <img src="image/README/SOI.jpg" alt="Image" width="400" style="display: block; margin: auto auto;">
 </div>
-The histopathology image is coverted to **spatial cellular map** with HistoCell and the cells are accumulated as clusters. Through the correlation analysis between clinical outcomes and cellular spatial clustering features, we identify spatial biomarkers for prognosis. Demo results can be found in Tutorial.ipynb. The representative spatial features for prognosis stratification is visualized as below.
+The histopathology image is coverted to cell spatial network with HistoCell and the cells are accumulated as clusters. Through the association analysis between clinical outcomes and cellular spatial clustering features, we identify spatial organization indicators (SOIs) for prognosis. Demo results can be found in Tutorial.ipynb. The representative SOIs and the corresponding K-M curves for prognostic risk stratification are visualized as below.
 <div align = center>
 <img src="image/README/biomarker.jpg" alt="Image" width="1000" style="display: block; margin: auto auto;">
 </div>
