@@ -10,6 +10,7 @@ from PIL import Image
 from utils.utils import load_json, load_image
 from torch.utils.data import Dataset
 from torchvision import transforms
+from tqdm import tqdm
 
 
 class TileBatchDataset(Dataset):
@@ -25,7 +26,10 @@ class TileBatchDataset(Dataset):
                  val=False, 
                  panuke=None, 
                  sample_ratio=1, 
-                 max_cell_num=128
+                 max_cell_num=128,
+                 ext='jpg',
+                 focus_tissue='Breast',
+                 reso=1
                  ) -> None:
         ### Batch Size should be 1
         self.tile_list = []
@@ -59,11 +63,12 @@ class TileBatchDataset(Dataset):
         self.val = val
         self.panuke = panuke
         self.mcn = max_cell_num
+        self.ext = ext
+        self.reso = reso
 
         with open(tissue, 'r') as tissue_file:
             self.tc = json.load(tissue_file)
         print(f"Tissue Compartment: {self.tc['list']}")
-
         if cell_dir is not None:
             cell_labels = {}
 
@@ -73,24 +78,25 @@ class TileBatchDataset(Dataset):
                     if sample_name not in prefix:
                         continue
                     cell_df = pd.read_csv(cell_prop, sep='\t', index_col=0)
-                    for cell_index, row in cell_df.iterrows():
+                    for cell_index, row in tqdm(cell_df.iterrows()):
                         cell_index = str(cell_index)
                         x, y, barcode = cell_index.split('_')
                         cell_num = np.array(row)
                         cell_propotion = cell_num / np.sum(cell_num)
-                        cell_labels.update(
-                            {
-                                sample_name + '_' + f'{x}x{y}': cell_propotion
-                            }
-                        )
                         abs_path = glob(os.path.join(tile_dir, sample_name, f'*_{x}x{y}.jpg'))
                         if len(abs_path) <= 0:
                             continue
-                        img_name = abs_path[0].split('/')[-1].replace('.jpg', '')
+                        img_name = abs_path[0].split('/')[-1].split('.')[0]
                         json_file = os.path.join(self.mask_dir, sample_name, f"json/{img_name}.json")
+                        cell_labels.update(
+                            {
+                                sample_name + '_' + img_name: cell_propotion
+                            }
+                        )
                         if not os.path.exists(json_file):
                             continue
                         self.tile_list.append(abs_path[0])
+
             elif deconv in ['Mix']:
                 for cell_prop in glob(os.path.join(cell_dir, "*.tsv")):
                     sample_name = cell_prop.split('/')[-1].replace('.tsv', '')
@@ -98,17 +104,20 @@ class TileBatchDataset(Dataset):
                         continue
                     cell_df = pd.read_csv(cell_prop, sep='\t', index_col=0)
                     for cell_index, row in cell_df.iterrows():
-                        cell_index = "%06d" % int(cell_index)
-                        abs_path = glob(os.path.join(tile_dir, sample_name, f'{cell_index}-Breast.jpg'))
+                        # cell_index = "%06d" % int(cell_index)
+                        cell_index = cell_index.split('-')[0]
+                        abs_path = glob(os.path.join(tile_dir, sample_name, f'{cell_index}-{focus_tissue}.{ext}'))
                         if len(abs_path) == 0:
                             continue
+                        tissue_index = abs_path[0].split('/')[-1].split('.')[0]
                         cell_propotion = np.array(row)
+                        cell_propotion = cell_propotion / np.sum(cell_propotion)
                         cell_labels.update(
                             {
-                                sample_name + '_' + cell_index + '-Breast': cell_propotion
+                                sample_name + '_' + tissue_index: cell_propotion
                             }
                         )
-                        img_name = abs_path[0].split('/')[-1].replace('.jpg', '')
+                        img_name = abs_path[0].split('/')[-1].replace(f'.{ext}', '')
                         json_file = os.path.join(self.mask_dir, sample_name, f"json/{img_name}.json")
                         if not os.path.exists(json_file):
                             continue
@@ -131,9 +140,9 @@ class TileBatchDataset(Dataset):
                     panuke = '*'
                 else:
                     panuke = f'*-{panuke}'
-                for abs_path in glob(os.path.join(tile_dir, f"{dir_prefix}/{panuke}.jpg")):
-                # for abs_path in glob(os.path.join(tile_dir, "tumor_003/*.jpg")):
-                    img_name = abs_path.split('/')[-1].replace('.jpg', '')
+                for abs_path in glob(os.path.join(tile_dir, f"{dir_prefix}/{panuke}.{ext}")):
+                # for abs_path in glob(os.path.join(tile_dir, f"tumor_003/*.{ext}")):
+                    img_name = abs_path.split('/')[-1].replace(f'.{ext}', '')
                     sample_name = abs_path.split('/')[-2]
                     json_file = os.path.join(self.mask_dir, sample_name, f"json/{img_name}.json")
                     if os.path.exists(json_file):
@@ -148,10 +157,11 @@ class TileBatchDataset(Dataset):
     def __getitem__(self, index: int):
         # load image
         img_path = self.tile_list[index]
-        img_name = img_path.split('/')[-1].replace('.jpg', '')
+        img_name = img_path.split('/')[-1].split('.')[0]
         sample_name = img_path.split('/')[-2]
         with open(img_path, 'rb') as fp:
-            pic = Image.open(fp)
+            pic = Image.open(fp).convert('RGB').resize((256 // self.reso, 256 // self.reso))
+            pic = pic.resize((256, 256))
             image = self.transforms(pic)
         
         # load mask
@@ -239,7 +249,7 @@ class TileBatchDataset(Dataset):
             tissue_cat = -1
 
         else:
-            sample_keys = sample_name + '_' + img_name.split('_')[-1]
+            sample_keys = sample_name + '_' + img_name
             cell_prop = self.cell_labels[sample_keys]
             # tc = np.zeros(len(self.tc['list']))
             # for cata_i, prop in enumerate(cell_prop):
@@ -264,7 +274,7 @@ class TileBatchDataset(Dataset):
     
 
 class TileBatchStateDataset(Dataset):
-    def __init__(self, tile_dir, mask_dir, tissue, cell_dir=None, state_dir=None, deconv='POLARIS', prefix=['*'], channels=3, aug=True, val=False, panuke=False, sample_ratio=1, max_cell_num=128) -> None:
+    def __init__(self, tile_dir, mask_dir, tissue, cell_dir=None, state_dir=None, deconv='POLARIS', prefix=['*'], channels=3, aug=True, val=False, panuke=False, sample_ratio=1, max_cell_num=128, ext='jpg') -> None:
         ### Batch Size should be 1
         self.tile_list = []
         
@@ -298,6 +308,7 @@ class TileBatchStateDataset(Dataset):
         self.val = val
         self.panuke = panuke
         self.mcn = max_cell_num
+        self.ext = ext
 
         with open(tissue, 'r') as tissue_file:
             self.tc = json.load(tissue_file)
@@ -337,7 +348,7 @@ class TileBatchStateDataset(Dataset):
                             }
                         )
 
-                        abs_path = glob(os.path.join(tile_dir, sample_name, f'*_{x}x{y}.jpg'))
+                        abs_path = glob(os.path.join(tile_dir, sample_name, f'*_{x}x{y}.{ext}'))
                         if len(abs_path) <= 0:
                             continue
                         img_name = abs_path[0].split('/')[-1].split('.')[0]
@@ -353,7 +364,7 @@ class TileBatchStateDataset(Dataset):
                     cell_df = pd.read_csv(cell_prop, sep='\t', index_col=0)
                     for cell_index, row in cell_df.iterrows():
                         cell_index = "%06d" % int(cell_index)
-                        abs_path = glob(os.path.join(tile_dir, sample_name, f'{cell_index}-Prostate.jpg'))
+                        abs_path = glob(os.path.join(tile_dir, sample_name, f'{cell_index}-Prostate.{ext}'))
                         if len(abs_path) == 0:
                             continue
                         cell_propotion = np.array(row)
@@ -382,10 +393,10 @@ class TileBatchStateDataset(Dataset):
         else:
             for dir_prefix in prefix:
                 path_list = []
-                print(os.path.join(tile_dir, f"{dir_prefix}/*.jpg"))
-                for abs_path in glob(os.path.join(tile_dir, f"{dir_prefix}/*.jpg")):
+                print(os.path.join(tile_dir, f"{dir_prefix}/*.{ext}"))
+                for abs_path in glob(os.path.join(tile_dir, f"{dir_prefix}/*.{ext}")):
                     # img_name = abs_path.split('/')[-1].split('.')[0]
-                    img_name = abs_path.split('/')[-1].strip('.jpg')
+                    img_name = abs_path.split('/')[-1].strip(f'.{ext}')
                     sample_name = abs_path.split('/')[-2]
                     json_file = os.path.join(self.mask_dir, sample_name, f"json/{img_name}.json")
                     # print(json_file)
@@ -401,7 +412,7 @@ class TileBatchStateDataset(Dataset):
     def __getitem__(self, index: int):
         # load image
         img_path = self.tile_list[index]
-        img_name = img_path.split('/')[-1].strip('.jpg')
+        img_name = img_path.split('/')[-1].strip(f'.{self.ext}')
         sample_name = img_path.split('/')[-2]
         with open(img_path, 'rb') as fp:
             pic = Image.open(fp)

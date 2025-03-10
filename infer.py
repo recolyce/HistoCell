@@ -7,7 +7,30 @@ from data import TileBatchDataset
 from utils.utils import *
 from torch.utils.data import DataLoader
 from tqdm import tqdm
-from configs import _get_config
+from yacs.config import CfgNode as CN
+
+def _get_config(tissue_type, deconv, subtype, k_class, tissue_dir):
+    config = CN()
+
+    config.data = CN()
+    config.data.deconv = deconv
+    config.data.save_model = f'./train_log/{tissue_type}/models'
+    config.data.ckpt = f'./train_log/{tissue_type}/ckpts'
+    config.data.tile_dir = f'./demo/data/{tissue_type}/tiles'
+    config.data.mask_dir = f'./demo/data/{tissue_type}/seg'
+    config.data.batch_size = 16
+    config.data.tissue_dir = tissue_dir
+    config.data.max_cell_num = 256
+
+    config.model = CN()
+    config.model.tissue_class = 3
+    config.model.pretrained = True
+    config.model.channels = 3
+
+    config.data.cell_dir = ''
+    config.model.k_class = k_class
+    
+    return config
 
 def main():
     os.environ['CUDA_VISIBLE_DEVICES'] = '0'

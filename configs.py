@@ -5,7 +5,7 @@ def _get_config(tissue_type, deconv, subtype, k_class, tissue_dir):
     config = CN()
     config.train = CN()
     config.train.lr = 0.0005
-    config.train.epoch = 31
+    config.train.epoch = 41
     config.train.val_iter = 10
     config.train.val_min_iter = 9
 
@@ -32,10 +32,10 @@ def _get_cell_state_config(tissue_type, deconv, subtype, tissue_dir):
     config = CN()
     config.train = CN()
     config.train.lr = 0.0005
-    config.train.epoch = 21
+    config.train.epoch = 41
     config.train.val_iter = 5
-    config.train.val_min_iter = 19
-    config.train.state_epoch = 21
+    config.train.val_min_iter = 9
+    config.train.state_epoch = 41
 
     config.data = CN()
     config.data.deconv = deconv

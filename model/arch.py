@@ -37,7 +37,7 @@ class GraphAttentionLayer(nn.Module):
         if self.concat:
             return F.elu(h_prime)
         else:
-            return h_prime
+            return h
 
     def _prepare_attentional_mechanism_input(self, Wh):
         # Wh.shape (N, out_feature)
@@ -86,7 +86,7 @@ class HistoCell(nn.Module):
         elif config.channels == 3:
             self.resnet = nn.Sequential(*list(resnet.children())[:-1])
 
-        self.gat = GAT(512, 512, 512, dropout=0.5, alpha=0.2, nheads=2)
+        self.gat = GraphAttentionLayer(512, 512, dropout=0.5, alpha=0.2, concat=False)
 
         self.size_embed = nn.Sequential(
             nn.Linear(2, 16),
@@ -105,7 +105,10 @@ class HistoCell(nn.Module):
         mask_feats = self.resnet(bag).squeeze().reshape(raw_size['batch'], raw_size['cells'], -1)
         size_feats = self.size_embed(cell_size) # B C 16
         mask_feats = self.merge(torch.concat([mask_feats, size_feats], dim=-1)) # B C 512
-        graph_feats = self.gat(mask_feats, adj) # B C 512
+        # import ipdb
+        # ipdb.set_trace()
+        dmask_feats = nn.functional.dropout(mask_feats, p=0.5, training=True)
+        graph_feats = self.gat(dmask_feats, adj) # B C 512
 
         global_feat = self.resnet(tissue).squeeze()
         if len(global_feat.shape) <= 1:
@@ -116,13 +119,14 @@ class HistoCell(nn.Module):
         seq_feats = rearrange(seq_feats, 'B C L F-> (B C) L F')
         out_feats, _ = self.out(seq_feats)
         out_feats = rearrange(out_feats, '(B C) L F-> B C L F', B=raw_size['batch'])    # B C 3 512
+        dout_feats = nn.functional.dropout(out_feats, p=0.5, training=True)
         
         # tissue
-        tissue_cat = self.tc(out_feats[:, 0, 0])
+        tissue_cat = self.tc(dout_feats[:, 0, 0])
         # Proportion
-        probs = self.predict(out_feats[:, :, 1]) # 16 64 cell_type
+        probs = self.predict(dout_feats[:, :, 1]) # 16 64 cell_type
         prop_list, prob_list, cell_features = [], [], []
-        for single_probs, valid_index, cell_embedding in zip(probs, valid_mask, out_feats[:, :, 1]):
+        for single_probs, valid_index, cell_embedding in zip(probs, valid_mask, dout_feats[:, :, 1]):
             if valid_index <= 0:
                 continue
             prop_list.append(torch.mean(single_probs[:valid_index], dim=0))
@@ -146,7 +150,7 @@ class HistoState(nn.Module):
         elif config.channels == 3:
             self.resnet = nn.Sequential(*list(resnet.children())[:-1])
 
-        self.gat = GAT(512, 512, 512, dropout=0.5, alpha=0.2, nheads=2)
+        self.gat = GraphAttentionLayer(512, 512, dropout=0.5, alpha=0.2, concat=False)
 
         self.size_embed = nn.Sequential(
             nn.Linear(2, 16),
