@@ -58,7 +58,7 @@ python train.py \
 --deconv RCTD \
 --prefix H1 \
 --k_class 6 \
---tissue_compartment ./tcs/tissue_compartment_addtype.json
+--tissue_compartment ./tcs/tissue_compartment_BRCA.json
 ```
 
 For the benchmark analysis on the PanNuke dataset, run the leave-one-out cross-validation command:
