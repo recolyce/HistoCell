@@ -37,7 +37,7 @@ class GraphAttentionLayer(nn.Module):
         if self.concat:
             return F.elu(h_prime)
         else:
-            return h
+            return h_prime
 
     def _prepare_attentional_mechanism_input(self, Wh):
         # Wh.shape (N, out_feature)
